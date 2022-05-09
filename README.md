@@ -42,26 +42,36 @@ cat direct0 | wc -l
 ```
 E.g. contains 348 entries.
 
-# find direct standalone installs
+# find standalone installs
 (nothing requires, has no deps - standalone/disconnected graph nodes)
 ```
-comm -23 direct0 <(cat direct[1-9] | sort -h | sort -u)
+comm -23 direct0 <(cat direct[1-9] | sort -u) > standalone
 ```
 Or use [difft](https://github.com/Wilfred/difftastic) for a pretty view.
 E.g., it contains 241 entries.
 
+This also includes base image packages, like kernel.
+
 Need to go deeper(c)...
 ```
-difft direct1 <(cat direct[2-9] | sort -h | sort -u)
-difft direct2 <(cat direct[3-9] | sort -h | sort -u)
+difft direct1 <(cat direct[2-9] | sort -u)
+difft direct2 <(cat direct[3-9] | sort -u)
 ...
 ???
 PROFIT?
 ```
 
+# find standalone userinstalled packages
+(a reduced subset of ``dnf history userinstalled`` which are also standalone)
+```
+sudo dnf history userinstalled | grep -v ' ' | awk -F'-[[:digit:]]' '{if ($1) print $1}' > direct99
+comm -12 direct99 standalone
+```
+E.g. this now shows only 63 entries of original 108 entries shown as userinstalled.
+
 # find top level installs
 (the rightmost nodes in the deps graph, excluding standalone ones)
 ```
-cat direct[1-9] | sort -h | sort -u
+cat direct[1-9] | sort -u
 ```
 E.g. it contains 108 entries.
